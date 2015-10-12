@@ -50,10 +50,6 @@ export default class DailymotionPlayback extends Playback {
       // document.body.appendChild(script)
   }
 
-  updateTest(e) {
-    console.log(e, 'funciona')
-  }
-
   embedDailymotionPlayer() {
     var playerVars = {
       api:'postMessage',
@@ -63,15 +59,17 @@ export default class DailymotionPlayback extends Playback {
       info: 0
     }
     DM.init()
+    var src_id = isDailymotionSrc(this.options.src)
     this.player = new DM.player('yt'+this.cid, {
-      video: this.options.src,
+      video: src_id,
       autoplay: 1,
       params: playerVars,
       events : {
-        apiready: this.ready(),
+        apiready: () => this.ready(),
         timeupdate: () => this.timeupdate(),
         ended: () => this.stateStop(),
-        playing: () => this.statePlaying()
+        playing: () => this.statePlaying(),
+        progress: () => this.progress()
       }
     })
   }
@@ -102,7 +100,8 @@ export default class DailymotionPlayback extends Playback {
     if (this._ready) {
       // this._progressTimer = this._progressTimer || setInterval(() => this.progress(), 100)
       this.playing = true
-      this.player.play()
+      this.player.togglePlay()
+      // this.player.play()
       this.trigger(Events.PLAYBACK_PLAY)
       this.trigger(Events.PLAYBACK_BUFFERFULL)
     } else {
@@ -112,13 +111,14 @@ export default class DailymotionPlayback extends Playback {
 
   pause() {
     this.playing = false
-    this.player.pause()
+    this.player.togglePlay()
+    // this.player.pause()
     this.trigger(Events.PLAYBACK_PAUSE)
   }
 
   seek(position) {
     if (!this.player) return
-    this.player.seek(position)
+    this.player.seek(this.player.duration / 100 * position)
   }
 
   volume(value) {
@@ -174,5 +174,17 @@ export default class DailymotionPlayback extends Playback {
 }
 
 DailymotionPlayback.canPlay = function(source) {
-  return true;
+  var result = isDailymotionSrc(source)
+  if (result !== null) {
+    return true
+  } else {
+    return false
+  }
 };
+
+var isDailymotionSrc = function(source) {
+  var regExp = /^.+dailymotion.com\/((video|hub)\/([^_]+))?[^#]*(#video=([^_&]+))?/
+  var result = source.match(regExp)
+
+  return result ? result[5] || result[3] : null;
+}
