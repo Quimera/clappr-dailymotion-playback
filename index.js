@@ -69,7 +69,6 @@ export default class DailymotionPlayback extends Playback {
     }
     DM.init()
     var src_id = isDailymotionSrc(this.options.src)
-    console.log(this)
     this.player = new DM.player('dm'+this.cid, {
       video: src_id,
       autoplay: 1,
