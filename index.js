@@ -5,7 +5,7 @@ import './dailymotion.css'
 
 export default class DailymotionPlayback extends Playback {
   get name() { return 'dailymotion' }
-  get template() { 
+  get template_gen() { 
     return template(DailyHTML) 
   }
   get attributes() {
@@ -26,7 +26,6 @@ export default class DailymotionPlayback extends Playback {
       right:['fullscreen','volume', 'hd-indicator']
     }
     Mediator.on(Events.PLAYER_RESIZE, this.updateSize, this)
-    this.render()
   }
 
   setupDailymotionPlayer() {
@@ -38,20 +37,30 @@ export default class DailymotionPlayback extends Playback {
   }
 
   embedDailymotionApiScript() {
-      
-      var e = document.createElement('script')
-      e.setAttribute('type', 'text/javascript')
-      e.setAttribute('async', 'async')
-      e.setAttribute('src', 'http://api.dmcdn.net/all.js')
-      var s = document.getElementsByTagName('script')[0]
-      
-      s.parentNode.insertBefore(e, s);
-      window.dmAsyncInit = () => this.embedDailymotionPlayer()
+      if (document.getElementsByTagName('script')[0].src !== 'http://api.dmcdn.net/all.js') {
+        var e = document.createElement('script')
+        e.setAttribute('type', 'text/javascript')
+        e.setAttribute('async', 'async')
+        e.setAttribute('src', 'http://api.dmcdn.net/all.js')
+        var s = document.getElementsByTagName('script')[0]        
+        s.parentNode.insertBefore(e, s);
+        window.players = []
+      }
+      window.players.push(this)
+
+      window.dmAsyncInit = () => this.AsyncExec()
       // document.body.appendChild(script)
+  }
+
+  AsyncExec() {
+    for (var i in window.players) {
+      window.players[i].embedDailymotionPlayer()
+    }
   }
 
   embedDailymotionPlayer() {
     var playerVars = {
+      id: 'dm'+this.cid,
       api:'postMessage',
       chromeless: 1,
       wmode:'opaque',
@@ -60,7 +69,8 @@ export default class DailymotionPlayback extends Playback {
     }
     DM.init()
     var src_id = isDailymotionSrc(this.options.src)
-    this.player = new DM.player('yt'+this.cid, {
+    console.log(this)
+    this.player = new DM.player('dm'+this.cid, {
       video: src_id,
       autoplay: 1,
       params: playerVars,
@@ -165,8 +175,8 @@ export default class DailymotionPlayback extends Playback {
   }
 
   render() {
-    var templateOptions = {id: 'yt'+this.cid}
-    this.$el.html(this.template(templateOptions))
+    var templateOptions = {id: 'dm'+this.cid}
+    this.$el.html(this.template_gen(templateOptions))
 
     this.setupDailymotionPlayer()
     return this
@@ -188,3 +198,5 @@ var isDailymotionSrc = function(source) {
 
   return result ? result[5] || result[3] : null;
 }
+
+module.exports = window.DailymotionPlayback = DailymotionPlayback;

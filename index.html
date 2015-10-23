@@ -7,18 +7,32 @@
 <body>
     <div id="player-wrapper"></div>
                 <script type="text/javascript" charset="utf-8">
-window.onload = function() {
+window.addEventListener("load",function() {
     player = new Clappr.Player({
         sources: ['http://www.dailymotion.com/video/xqdlrf_sintel_shortfilms'],
         poster: 'https://i.ytimg.com/vi/nfWlot6h_JM/hqdefault.jpg',
         parentId: '#player-wrapper',
         position: 'top-right',
-        youtubeShowRelated: true,
         plugins: {
             playback: [DailymotionPlayback]
         }
     });
-}
+}, false);
+    </script>
+
+    <div id="player-wrapper2"></div>
+                <script type="text/javascript" charset="utf-8">
+window.addEventListener("load",function() {
+    player2 = new Clappr.Player({
+        sources: ['http://www.dailymotion.com/video/xqdlrf_sintel_shortfilms'],
+        poster: 'https://i.ytimg.com/vi/nfWlot6h_JM/hqdefault.jpg',
+        parentId: '#player-wrapper2',
+        position: 'top-right',
+        plugins: {
+            playback: [DailymotionPlayback]
+        }
+    });
+}, false);
     </script>
     <script type="text/javascript" charset="utf-8" src="./node_modules/clappr/dist/clappr.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="./dist/dailymotion.js"> </script>
