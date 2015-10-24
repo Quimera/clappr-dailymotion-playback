@@ -44,17 +44,17 @@ export default class DailymotionPlayback extends Playback {
         e.setAttribute('src', 'http://api.dmcdn.net/all.js')
         var s = document.getElementsByTagName('script')[0]        
         s.parentNode.insertBefore(e, s);
-        window.players = []
+        window.dmplayers = []
       }
-      window.players.push(this)
+      window.dmplayers.push(this)
 
       window.dmAsyncInit = () => this.AsyncExec()
       // document.body.appendChild(script)
   }
 
   AsyncExec() {
-    for (var i in window.players) {
-      window.players[i].embedDailymotionPlayer()
+    for (var i in window.dmplayers) {
+      window.dmplayers[i].embedDailymotionPlayer()
     }
   }
 
